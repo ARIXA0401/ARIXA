@@ -1,0 +1,963 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ARIXA Health — Governance Infrastructure for Modern Healthcare</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Source+Sans+3:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              navy: { DEFAULT: '#0B1D3A', light: '#0F2E5C' },
+              teal: { DEFAULT: '#00A5A8', light: '#00C9B7', subtle: '#E6F7F7' },
+              slate: '#334155',
+              warmgrey: '#94A3B8',
+            },
+            fontFamily: {
+              heading: ['Inter', 'sans-serif'],
+              body: ['Source Sans 3', 'Inter', 'sans-serif'],
+            },
+          },
+        },
+      }
+    </script>
+
+    <style>
+      body { font-family: 'Source Sans 3', 'Inter', sans-serif; color: #334155; }
+      h1,h2,h3,h4,h5,h6 { font-family: 'Inter', sans-serif; color: #0B1D3A; }
+      .gradient-navy { background: linear-gradient(135deg, #0B1D3A 0%, #122B55 50%, #0B1D3A 100%); }
+
+      /* Scroll animations */
+      .reveal { opacity: 0; transform: translateY(24px); transition: opacity 0.7s ease, transform 0.7s ease; }
+      .reveal.visible { opacity: 1; transform: translateY(0); }
+      .reveal-delay-1 { transition-delay: 0.1s; }
+      .reveal-delay-2 { transition-delay: 0.2s; }
+      .reveal-delay-3 { transition-delay: 0.3s; }
+
+      /* Video play button animation */
+      .play-btn { transition: transform 0.3s ease, box-shadow 0.3s ease; }
+      .play-btn:hover { transform: scale(1.1); box-shadow: 0 0 40px rgba(0,165,168,0.4); }
+
+      /* Tab system */
+      .explainer-tab { transition: all 0.3s ease; }
+      .explainer-tab.active { color: #00C9B7; border-bottom-color: #00C9B7; }
+      .explainer-panel { display: none; animation: panelIn 0.4s ease; }
+      .explainer-panel.active { display: block; }
+      @keyframes panelIn { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:translateY(0); } }
+
+      /* How it works cards */
+      .how-card { transition: all 0.3s ease; }
+      .how-card:hover { transform: translateY(-6px); box-shadow: 0 20px 40px rgba(0,165,168,0.12); border-color: #00A5A8; }
+
+      /* Step connector */
+      .step-connector { position: relative; }
+      .step-connector::after {
+        content: ''; position: absolute; top: 50%; right: -1.5rem; width: 3rem; height: 2px;
+        background: linear-gradient(90deg, #00A5A8, #00C9B7); display: none;
+      }
+      @media (min-width: 768px) { .step-connector::after { display: block; } }
+
+      /* Stat counter animation */
+      .stat-num { font-variant-numeric: tabular-nums; }
+    </style>
+</head>
+<body class="bg-white">
+
+  <!-- ==================== NAVBAR ==================== -->
+  <nav id="navbar" class="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-sm border-b border-gray-100 transition-shadow duration-300">
+    <div class="max-w-7xl mx-auto px-6 lg:px-8 h-16 flex items-center justify-between">
+      <!-- Logo -->
+      <a href="#" class="flex items-center gap-2">
+        <span class="inline-block w-3 h-3 bg-teal rounded-sm"></span>
+        <span class="font-heading font-extrabold text-xl tracking-tight text-navy">ARIXA</span>
+        <span class="text-warmgrey text-xs font-semibold tracking-[0.15em] ml-1">HEALTH</span>
+      </a>
+
+      <!-- Desktop nav -->
+      <div class="hidden md:flex items-center gap-8">
+        <a href="#how-it-works" class="text-sm font-medium text-slate hover:text-teal transition-colors">How It Works</a>
+        <a href="#platform" class="text-sm font-medium text-slate hover:text-teal transition-colors">Platform</a>
+        <a href="#solutions" class="text-sm font-medium text-slate hover:text-teal transition-colors">Solutions</a>
+        <a href="#about" class="text-sm font-medium text-slate hover:text-teal transition-colors">About</a>
+      </div>
+
+      <!-- CTA -->
+      <div class="hidden md:block">
+        <a href="#contact" class="inline-flex items-center px-5 py-2.5 bg-teal text-white text-sm font-semibold rounded-lg hover:bg-[#008B8E] transition-all hover:-translate-y-0.5">
+          Request a Demo
+        </a>
+      </div>
+
+      <!-- Mobile hamburger -->
+      <button id="hamburger" class="md:hidden flex flex-col gap-1.5 p-2" aria-label="Menu">
+        <span class="block w-5 h-0.5 bg-navy transition-all origin-center" id="h1"></span>
+        <span class="block w-5 h-0.5 bg-navy transition-all" id="h2"></span>
+        <span class="block w-5 h-0.5 bg-navy transition-all origin-center" id="h3"></span>
+      </button>
+    </div>
+
+    <!-- Mobile menu -->
+    <div id="mobileMenu" class="hidden md:hidden bg-white border-t border-gray-100 px-6 py-4 space-y-3">
+      <a href="#how-it-works" class="block py-2 text-slate font-medium">How It Works</a>
+      <a href="#platform" class="block py-2 text-slate font-medium">Platform</a>
+      <a href="#solutions" class="block py-2 text-slate font-medium">Solutions</a>
+      <a href="#about" class="block py-2 text-slate font-medium">About</a>
+      <a href="#contact" class="block mt-2 text-center px-5 py-2.5 bg-teal text-white font-semibold rounded-lg">Request a Demo</a>
+    </div>
+  </nav>
+
+
+  <!-- ==================== HERO WITH VIDEO ==================== -->
+  <section class="gradient-navy pt-28 pb-20 px-6 lg:px-8 relative overflow-hidden">
+    <!-- Decorative elements -->
+    <div class="absolute top-20 right-10 w-72 h-72 bg-teal/5 rounded-full blur-3xl"></div>
+    <div class="absolute bottom-10 left-10 w-96 h-96 bg-teal/3 rounded-full blur-3xl"></div>
+
+    <div class="max-w-6xl mx-auto relative z-10">
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center mb-16">
+        <!-- Left: Headline & CTAs -->
+        <div>
+          <p class="text-teal-light text-sm font-semibold tracking-widest uppercase mb-4 reveal">Governance Infrastructure</p>
+          <h1 class="font-heading text-4xl sm:text-5xl lg:text-[3.25rem] font-extrabold text-white leading-[1.08] tracking-tight mb-6 reveal">
+            The <span class="text-teal-light">Governance Infrastructure</span> for Modern Healthcare
+          </h1>
+          <p class="text-lg text-gray-300 leading-relaxed mb-8 reveal reveal-delay-1">
+            Powering UK pharmacy-led clinical services with science, safety, and scale. ARIXA handles the entire patient journey so prescribers just approve or decline.
+          </p>
+
+          <div class="flex flex-col sm:flex-row gap-4 reveal reveal-delay-2">
+            <a href="#contact" class="inline-flex items-center justify-center px-7 py-3.5 bg-teal text-white font-semibold rounded-lg hover:bg-[#008B8E] transition-all hover:-translate-y-0.5 text-base">
+              Request a Demo
+            </a>
+            <a href="#how-it-works" class="inline-flex items-center justify-center px-7 py-3.5 border-2 border-white/30 text-white font-semibold rounded-lg hover:bg-white hover:text-navy transition-all text-base">
+              See How It Works
+            </a>
+          </div>
+        </div>
+
+        <!-- Right: Video Player -->
+        <div class="reveal reveal-delay-1">
+          <div class="relative rounded-2xl overflow-hidden bg-navy-light aspect-video shadow-2xl group cursor-pointer border border-white/10" id="videoPlaceholder">
+            <!-- Background visual -->
+            <div class="absolute inset-0" style="background: linear-gradient(135deg, #0F2E5C 0%, #0B1D3A 100%);">
+              <!-- Decorative flow lines -->
+              <svg class="absolute inset-0 w-full h-full opacity-15" viewBox="0 0 800 450">
+                <path d="M100,225 Q200,100 400,225 Q600,350 700,225" stroke="#00A5A8" stroke-width="2" fill="none" stroke-dasharray="8,6"/>
+                <path d="M50,280 Q250,150 450,280 Q650,400 750,280" stroke="#00C9B7" stroke-width="1.5" fill="none" stroke-dasharray="6,8"/>
+                <circle cx="150" cy="200" r="4" fill="#00A5A8" opacity="0.5"/>
+                <circle cx="400" cy="220" r="5" fill="#00C9B7" opacity="0.5"/>
+                <circle cx="650" cy="240" r="4" fill="#00A5A8" opacity="0.5"/>
+              </svg>
+
+              <!-- Three layer labels behind play button -->
+              <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center gap-6 opacity-20">
+                <div class="text-center text-white">
+                  <div class="text-xs font-semibold">Patient</div>
+                  <div class="text-[10px]">Workflow</div>
+                </div>
+                <svg class="w-4 h-4 text-teal-light" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                <div class="text-center text-white">
+                  <div class="text-xs font-semibold">Prescriber</div>
+                  <div class="text-[10px]">Decision</div>
+                </div>
+                <svg class="w-4 h-4 text-teal-light" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                <div class="text-center text-white">
+                  <div class="text-xs font-semibold">Governance</div>
+                  <div class="text-[10px]">Backbone</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Play button -->
+            <div class="absolute inset-0 flex items-center justify-center">
+              <div class="play-btn w-20 h-20 rounded-full bg-teal flex items-center justify-center shadow-lg shadow-teal/30">
+                <svg class="w-8 h-8 text-white ml-1" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+              </div>
+            </div>
+
+            <!-- Label -->
+            <div class="absolute top-4 left-4 bg-black/40 backdrop-blur text-white/80 text-xs font-medium px-3 py-1.5 rounded-full">
+              See It In Action
+            </div>
+
+            <!-- Duration badge -->
+            <div class="absolute bottom-4 right-4 bg-black/50 backdrop-blur text-white text-xs font-medium px-3 py-1.5 rounded-full">
+              1:30
+            </div>
+          </div>
+          <p class="text-center text-white/40 text-sm mt-3">From patient intake to governed prescribing — the complete ARIXA journey</p>
+        </div>
+      </div>
+
+      <!-- Stats bar -->
+      <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 reveal reveal-delay-3">
+        <div class="bg-white/[0.07] backdrop-blur border border-white/10 rounded-xl p-5 text-center">
+          <div class="font-heading text-3xl font-extrabold text-white stat-num">95%</div>
+          <div class="text-sm text-gray-400 mt-1">Patient Retention</div>
+        </div>
+        <div class="bg-white/[0.07] backdrop-blur border border-white/10 rounded-xl p-5 text-center">
+          <div class="font-heading text-3xl font-extrabold text-white stat-num">10x</div>
+          <div class="text-sm text-gray-400 mt-1">Clinician Capacity</div>
+        </div>
+        <div class="bg-white/[0.07] backdrop-blur border border-white/10 rounded-xl p-5 text-center">
+          <div class="font-heading text-3xl font-extrabold text-white stat-num">~2 min</div>
+          <div class="text-sm text-gray-400 mt-1">Clinical Review</div>
+        </div>
+        <div class="bg-white/[0.07] backdrop-blur border border-white/10 rounded-xl p-5 text-center">
+          <div class="font-heading text-3xl font-extrabold text-white stat-num">100%</div>
+          <div class="text-sm text-gray-400 mt-1">Audit-Ready</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ==================== HOW IT WORKS — 3 COLUMNS ==================== -->
+  <section id="how-it-works" class="py-20 px-6 lg:px-8 bg-white">
+    <div class="max-w-6xl mx-auto">
+      <div class="text-center mb-14">
+        <p class="text-teal text-xs font-bold tracking-[0.15em] uppercase mb-3 reveal">How It Works</p>
+        <h2 class="font-heading text-3xl sm:text-4xl font-bold reveal">Three Layers. One <span class="text-teal">Seamless</span> Platform.</h2>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <!-- Card 1 -->
+        <div class="how-card bg-white border border-gray-200 rounded-2xl p-8 reveal">
+          <div class="flex items-center gap-3 mb-5">
+            <div class="w-10 h-10 rounded-lg bg-teal/10 flex items-center justify-center">
+              <span class="font-heading font-extrabold text-teal text-lg">01</span>
+            </div>
+            <h3 class="font-heading text-xl font-bold text-navy">Patient Workflow</h3>
+          </div>
+          <p class="text-slate leading-relaxed mb-6">
+            Takes a patient from "I want treatment" through eligibility screening, MHRA-compliant assessments, blood test ordering via London Medical Laboratory, consent capture, and checkout — one seamless digital journey.
+          </p>
+          <div class="flex flex-wrap gap-2">
+            <span class="text-xs font-medium bg-teal-subtle text-teal px-3 py-1 rounded-full">Screening</span>
+            <span class="text-xs font-medium bg-teal-subtle text-teal px-3 py-1 rounded-full">Assessment</span>
+            <span class="text-xs font-medium bg-teal-subtle text-teal px-3 py-1 rounded-full">Blood Tests</span>
+            <span class="text-xs font-medium bg-teal-subtle text-teal px-3 py-1 rounded-full">Consent</span>
+            <span class="text-xs font-medium bg-teal-subtle text-teal px-3 py-1 rounded-full">Checkout</span>
+          </div>
+        </div>
+
+        <!-- Card 2 -->
+        <div class="how-card bg-white border border-gray-200 rounded-2xl p-8 reveal reveal-delay-1">
+          <div class="flex items-center gap-3 mb-5">
+            <div class="w-10 h-10 rounded-lg bg-teal/10 flex items-center justify-center">
+              <span class="font-heading font-extrabold text-teal text-lg">02</span>
+            </div>
+            <h3 class="font-heading text-xl font-bold text-navy">Prescriber Decision Layer</h3>
+          </div>
+          <p class="text-slate leading-relaxed mb-6">
+            Compresses all patient data into a structured clinical summary so a prescriber can safely approve or decline in ~2 minutes. Replaces 15–20 minute manual reviews, enabling 10x clinician capacity.
+          </p>
+          <div class="flex items-center gap-4 mt-auto">
+            <div class="flex items-center gap-2">
+              <div class="w-8 h-8 rounded-full bg-teal-light/20 flex items-center justify-center">
+                <svg class="w-4 h-4 text-teal" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M12 8v4l3 3"/><circle cx="12" cy="12" r="10"/></svg>
+              </div>
+              <span class="text-sm font-semibold text-navy">~2 min</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <div class="w-8 h-8 rounded-full bg-emerald-50 flex items-center justify-center">
+                <svg class="w-4 h-4 text-emerald-500" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+              </div>
+              <span class="text-sm font-semibold text-navy">10x capacity</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 3 -->
+        <div class="how-card bg-white border border-gray-200 rounded-2xl p-8 reveal reveal-delay-2">
+          <div class="flex items-center gap-3 mb-5">
+            <div class="w-10 h-10 rounded-lg bg-teal/10 flex items-center justify-center">
+              <span class="font-heading font-extrabold text-teal text-lg">03</span>
+            </div>
+            <h3 class="font-heading text-xl font-bold text-navy">Governance Backbone</h3>
+          </div>
+          <p class="text-slate leading-relaxed mb-6">
+            Every action timestamped, every protocol NICE/MHRA-aligned, every record audit-ready. GPhC, CQC, MHRA, and UK GDPR governance built in. Inspection-ready from day one.
+          </p>
+          <div class="flex flex-wrap gap-2">
+            <span class="text-xs font-semibold bg-navy/5 text-navy px-3 py-1 rounded-full">GPhC</span>
+            <span class="text-xs font-semibold bg-navy/5 text-navy px-3 py-1 rounded-full">CQC</span>
+            <span class="text-xs font-semibold bg-navy/5 text-navy px-3 py-1 rounded-full">MHRA</span>
+            <span class="text-xs font-semibold bg-navy/5 text-navy px-3 py-1 rounded-full">NICE</span>
+            <span class="text-xs font-semibold bg-navy/5 text-navy px-3 py-1 rounded-full">UK GDPR</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+
+
+  <!-- ==================== PROBLEM STATEMENT ==================== -->
+  <section class="py-20 px-6 lg:px-8 bg-white">
+    <div class="max-w-6xl mx-auto">
+      <p class="text-teal text-xs font-bold tracking-[0.15em] uppercase mb-3 reveal">The Structural Gap</p>
+      <h2 class="font-heading text-3xl sm:text-4xl font-bold mb-10 reveal">What Happens Between Inspections?</h2>
+
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+        <div class="reveal">
+          <p class="text-lg text-slate leading-relaxed mb-5">
+            Most healthcare organisations maintain documented procedures and protocols. Yet between statutory reviews, a structural gap emerges: what's documented and what actually happens diverge.
+          </p>
+          <p class="text-slate leading-relaxed mb-5">
+            <strong class="text-navy">Procedural drift occurs silently.</strong> Undetected deviations accumulate, regulatory risk grows, and the next review can reveal gaps nobody saw coming.
+          </p>
+          <p class="text-warmgrey leading-relaxed">
+            This isn't negligence — it's the natural consequence of running complex operations without continuous oversight of governance adherence. ARIXA bridges that gap.
+          </p>
+        </div>
+
+        <!-- Timeline visual -->
+        <div class="reveal reveal-delay-1">
+          <div class="bg-gray-50 rounded-2xl p-8 border border-gray-200 relative">
+            <div class="flex items-center justify-between mb-8">
+              <div class="text-center">
+                <div class="w-12 h-12 rounded-full bg-emerald-100 flex items-center justify-center mx-auto mb-2">
+                  <svg class="w-5 h-5 text-emerald-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+                </div>
+                <div class="text-xs font-bold text-navy">Last Review</div>
+                <div class="text-xs text-warmgrey">T = 0</div>
+              </div>
+
+              <div class="flex-1 mx-4 relative">
+                <div class="h-0.5 bg-gradient-to-r from-emerald-300 via-amber-300 to-red-300"></div>
+              </div>
+
+              <div class="text-center">
+                <div class="w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center mx-auto mb-2">
+                  <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+                </div>
+                <div class="text-xs font-bold text-navy">Next Review</div>
+                <div class="text-xs text-warmgrey">T = 12 months</div>
+              </div>
+            </div>
+
+            <!-- Risk indicators -->
+            <div class="space-y-3">
+              <div class="flex items-center gap-3 bg-amber-50 border border-amber-200 rounded-lg px-4 py-2.5">
+                <div class="w-2 h-2 rounded-full bg-amber-400"></div>
+                <span class="text-sm text-amber-800 font-medium">Procedural drift</span>
+              </div>
+              <div class="flex items-center gap-3 bg-orange-50 border border-orange-200 rounded-lg px-4 py-2.5">
+                <div class="w-2 h-2 rounded-full bg-orange-400"></div>
+                <span class="text-sm text-orange-800 font-medium">Undetected deviations</span>
+              </div>
+              <div class="flex items-center gap-3 bg-red-50 border border-red-200 rounded-lg px-4 py-2.5">
+                <div class="w-2 h-2 rounded-full bg-red-400"></div>
+                <span class="text-sm text-red-800 font-medium">Growing regulatory risk</span>
+              </div>
+            </div>
+
+            <!-- ARIXA solution callout -->
+            <div class="mt-6 bg-teal-subtle border border-teal/20 rounded-lg px-4 py-3 flex items-center gap-3">
+              <svg class="w-5 h-5 text-teal flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+              <span class="text-sm text-teal font-semibold">ARIXA provides continuous oversight — no more gaps</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ==================== ACE MODEL ==================== -->
+  <section class="py-20 px-6 lg:px-8 bg-gray-50">
+    <div class="max-w-6xl mx-auto">
+      <div class="text-center mb-14">
+        <p class="text-teal text-xs font-bold tracking-[0.15em] uppercase mb-3 reveal">Methodology</p>
+        <h2 class="font-heading text-3xl sm:text-4xl font-bold reveal">The <span class="text-teal">ACE</span> Model</h2>
+        <p class="text-warmgrey text-lg mt-3 max-w-2xl mx-auto reveal">Governance as a closed-loop system of continuous oversight</p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+        <!-- Audit -->
+        <div class="bg-white border border-gray-200 rounded-2xl p-7 text-center hover:border-teal hover:shadow-lg transition-all reveal">
+          <div class="w-14 h-14 rounded-xl bg-teal/10 flex items-center justify-center mx-auto mb-5">
+            <svg class="w-7 h-7 text-teal" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+          </div>
+          <h3 class="font-heading text-xl font-bold mb-3">Audit</h3>
+          <p class="text-warmgrey leading-relaxed text-sm">
+            Assessing baseline intent and governance posture. Understanding where you are before defining where you need to be.
+          </p>
+        </div>
+
+        <!-- Control -->
+        <div class="bg-white border border-gray-200 rounded-2xl p-7 text-center hover:border-teal hover:shadow-lg transition-all reveal reveal-delay-1">
+          <div class="w-14 h-14 rounded-xl bg-teal/10 flex items-center justify-center mx-auto mb-5">
+            <svg class="w-7 h-7 text-teal" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+          </div>
+          <h3 class="font-heading text-xl font-bold mb-3">Control</h3>
+          <p class="text-warmgrey leading-relaxed text-sm">
+            Converting regulatory expectations into documented, version-controlled procedures that become your operational standard.
+          </p>
+        </div>
+
+        <!-- Enforcement -->
+        <div class="bg-white border border-gray-200 rounded-2xl p-7 text-center hover:border-teal hover:shadow-lg transition-all reveal reveal-delay-2">
+          <div class="w-14 h-14 rounded-xl bg-teal/10 flex items-center justify-center mx-auto mb-5">
+            <svg class="w-7 h-7 text-teal" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg>
+          </div>
+          <h3 class="font-heading text-xl font-bold mb-3">Enforcement</h3>
+          <p class="text-warmgrey leading-relaxed text-sm">
+            Ensuring procedures are followed and evidenced in real-time. Continuous oversight between statutory reviews, not just during them.
+          </p>
+        </div>
+      </div>
+
+      <!-- Loop indicator -->
+      <div class="text-center reveal">
+        <div class="inline-flex items-center gap-3 bg-teal-subtle px-6 py-3 rounded-full">
+          <svg class="w-5 h-5 text-teal" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.2"/></svg>
+          <span class="text-sm font-semibold text-teal">Continuous closed-loop governance</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ==================== INTERACTIVE EXPLAINER ==================== -->
+  <section id="platform" class="py-20 px-6 lg:px-8 gradient-navy relative overflow-hidden">
+    <div class="absolute top-0 right-0 w-96 h-96 bg-teal/5 rounded-full blur-3xl"></div>
+
+    <div class="max-w-6xl mx-auto relative z-10">
+      <div class="text-center mb-12">
+        <p class="text-teal-light text-xs font-bold tracking-[0.15em] uppercase mb-3 reveal">Interactive Platform Demo</p>
+        <h2 class="font-heading text-3xl sm:text-4xl font-bold text-white reveal">Explore Each Layer</h2>
+      </div>
+
+      <!-- Tabs -->
+      <div class="flex justify-center border-b border-white/10 mb-10 reveal">
+        <button class="explainer-tab active px-6 py-3 text-sm font-semibold text-white/60 border-b-2 border-transparent" data-panel="panel-patient">Patient Workflow</button>
+        <button class="explainer-tab px-6 py-3 text-sm font-semibold text-white/60 border-b-2 border-transparent" data-panel="panel-prescriber">Prescriber Decision</button>
+        <button class="explainer-tab px-6 py-3 text-sm font-semibold text-white/60 border-b-2 border-transparent" data-panel="panel-governance">Governance Backbone</button>
+      </div>
+
+      <!-- Panel: Patient Workflow -->
+      <div class="explainer-panel active" id="panel-patient">
+        <div class="grid grid-cols-5 gap-2 md:gap-4 mb-8">
+          <div class="text-center">
+            <div class="w-14 h-14 mx-auto rounded-xl bg-teal/20 border border-teal/40 flex items-center justify-center mb-3">
+              <svg class="w-6 h-6 text-teal-light" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+            </div>
+            <div class="text-white text-xs font-semibold">Screening</div>
+          </div>
+          <div class="text-center">
+            <div class="w-14 h-14 mx-auto rounded-xl bg-teal/20 border border-teal/40 flex items-center justify-center mb-3">
+              <svg class="w-6 h-6 text-teal-light" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+            </div>
+            <div class="text-white text-xs font-semibold">Assessment</div>
+          </div>
+          <div class="text-center">
+            <div class="w-14 h-14 mx-auto rounded-xl bg-teal/20 border border-teal/40 flex items-center justify-center mb-3">
+              <svg class="w-6 h-6 text-teal-light" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+            </div>
+            <div class="text-white text-xs font-semibold">Blood Test</div>
+          </div>
+          <div class="text-center">
+            <div class="w-14 h-14 mx-auto rounded-xl bg-teal/20 border border-teal/40 flex items-center justify-center mb-3">
+              <svg class="w-6 h-6 text-teal-light" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            </div>
+            <div class="text-white text-xs font-semibold">Consent</div>
+          </div>
+          <div class="text-center">
+            <div class="w-14 h-14 mx-auto rounded-xl bg-teal/20 border border-teal/40 flex items-center justify-center mb-3">
+              <svg class="w-6 h-6 text-teal-light" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+            </div>
+            <div class="text-white text-xs font-semibold">Checkout</div>
+          </div>
+        </div>
+        <p class="text-white/70 text-center text-sm max-w-xl mx-auto">One seamless digital journey — from "I want treatment" to completed checkout. Every step logged, governed, and compliant by design.</p>
+      </div>
+
+      <!-- Panel: Prescriber Decision -->
+      <div class="explainer-panel" id="panel-prescriber">
+        <div class="max-w-lg mx-auto text-center">
+          <div class="space-y-2 mb-6">
+            <div class="bg-white/10 border border-white/20 rounded-lg px-4 py-2 text-white/80 text-sm">Patient Demographics & History</div>
+            <div class="bg-white/10 border border-white/20 rounded-lg px-4 py-2 text-white/80 text-sm">Clinical Assessment Results</div>
+            <div class="bg-white/10 border border-white/20 rounded-lg px-4 py-2 text-white/80 text-sm">Blood Test Results (LML)</div>
+            <div class="bg-white/10 border border-white/20 rounded-lg px-4 py-2 text-white/80 text-sm">Risk Score & Eligibility</div>
+          </div>
+          <div class="text-teal-light text-2xl mb-4">↓</div>
+          <div class="bg-teal/20 border-2 border-teal rounded-xl px-6 py-4 mb-6">
+            <div class="text-teal-light font-bold text-lg">Structured Clinical Summary</div>
+            <div class="text-white/60 text-sm mt-1">Everything a prescriber needs — in one view</div>
+          </div>
+          <div class="flex items-center justify-center gap-6">
+            <span class="inline-flex items-center gap-2 bg-teal-light/20 text-teal-light px-4 py-2 rounded-full text-sm font-bold">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+              ~2 min review
+            </span>
+            <span class="inline-flex items-center gap-2 bg-emerald-500/20 text-emerald-300 px-4 py-2 rounded-full text-sm font-bold">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+              10x capacity
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Panel: Governance Backbone -->
+      <div class="explainer-panel" id="panel-governance">
+        <div class="max-w-2xl mx-auto">
+          <div class="grid grid-cols-4 gap-3 mb-8">
+            <div class="bg-white/5 border border-white/10 rounded-lg p-3 text-center">
+              <div class="text-teal-light text-xs font-mono font-bold mb-1">T+0s</div>
+              <div class="text-white text-xs">Screening Log</div>
+            </div>
+            <div class="bg-white/5 border border-white/10 rounded-lg p-3 text-center">
+              <div class="text-teal-light text-xs font-mono font-bold mb-1">T+45s</div>
+              <div class="text-white text-xs">Assessment Verified</div>
+            </div>
+            <div class="bg-white/5 border border-white/10 rounded-lg p-3 text-center">
+              <div class="text-teal-light text-xs font-mono font-bold mb-1">T+90s</div>
+              <div class="text-white text-xs">Blood Test Ordered</div>
+            </div>
+            <div class="bg-white/5 border border-white/10 rounded-lg p-3 text-center">
+              <div class="text-teal-light text-xs font-mono font-bold mb-1">T+120s</div>
+              <div class="text-white text-xs">Consent Captured</div>
+            </div>
+          </div>
+
+          <div class="bg-teal/10 border border-teal/30 rounded-xl p-5 mb-6">
+            <div class="flex items-center gap-2 mb-3">
+              <svg class="w-5 h-5 text-teal-light" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+              <span class="text-white font-semibold text-sm">Full Governance Overlay Active</span>
+            </div>
+            <p class="text-white/60 text-sm">Every action timestamped, every protocol aligned, every record ready for review.</p>
+          </div>
+
+          <div class="flex flex-wrap justify-center gap-3">
+            <span class="bg-white/10 border border-white/20 text-white px-4 py-2 rounded-lg text-xs font-bold">GPhC</span>
+            <span class="bg-white/10 border border-white/20 text-white px-4 py-2 rounded-lg text-xs font-bold">CQC</span>
+            <span class="bg-white/10 border border-white/20 text-white px-4 py-2 rounded-lg text-xs font-bold">MHRA</span>
+            <span class="bg-white/10 border border-white/20 text-white px-4 py-2 rounded-lg text-xs font-bold">NICE</span>
+            <span class="bg-white/10 border border-white/20 text-white px-4 py-2 rounded-lg text-xs font-bold">UK GDPR</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ==================== SCALING SAFELY ==================== -->
+  <section id="solutions" class="py-20 px-6 lg:px-8 bg-white">
+    <div class="max-w-6xl mx-auto">
+      <p class="text-teal text-xs font-bold tracking-[0.15em] uppercase mb-3 reveal">Strategic Growth</p>
+      <h2 class="font-heading text-3xl sm:text-4xl font-bold mb-10 reveal">Scale Without the Governance Ceiling</h2>
+
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
+        <div>
+          <div class="flex gap-4 mb-6 reveal">
+            <div class="w-12 h-12 rounded-xl bg-teal/10 flex items-center justify-center flex-shrink-0">
+              <svg class="w-6 h-6 text-teal" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg>
+            </div>
+            <div>
+              <h4 class="font-heading font-bold text-navy mb-1">11,000+ Pharmacies, &lt;1% Structured</h4>
+              <p class="text-warmgrey text-sm leading-relaxed">The UK pharmacy estate is massive. Yet the infrastructure for scaled governance is almost entirely missing.</p>
+            </div>
+          </div>
+          <div class="flex gap-4 mb-6 reveal reveal-delay-1">
+            <div class="w-12 h-12 rounded-xl bg-teal/10 flex items-center justify-center flex-shrink-0">
+              <svg class="w-6 h-6 text-teal" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            </div>
+            <div>
+              <h4 class="font-heading font-bold text-navy mb-1">7M+ NHS Waiting List</h4>
+              <p class="text-warmgrey text-sm leading-relaxed">Demand for community healthcare is stratospheric. Pharmacies can absorb it — if governance doesn't become the bottleneck.</p>
+            </div>
+          </div>
+          <div class="flex gap-4 mb-6 reveal reveal-delay-2">
+            <div class="w-12 h-12 rounded-xl bg-teal/10 flex items-center justify-center flex-shrink-0">
+              <svg class="w-6 h-6 text-teal" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+            </div>
+            <div>
+              <h4 class="font-heading font-bold text-navy mb-1">10x GLP-1 Market Growth</h4>
+              <p class="text-warmgrey text-sm leading-relaxed">Pharmacy-led services like GLP-1 weight management are exploding. The first-mover advantage window is now.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="reveal">
+          <div class="bg-gray-50 rounded-2xl p-8 border border-gray-200">
+            <p class="text-lg text-navy font-semibold leading-relaxed mb-4">
+              Demand isn't the bottleneck. The ability to demonstrate safe, controlled operations at volume is.
+            </p>
+            <p class="text-slate leading-relaxed mb-4">
+              Most services plateau when they can no longer safely manage governance at scale. ARIXA removes that constraint by embedding continuous oversight into the operation itself.
+            </p>
+            <p class="text-warmgrey leading-relaxed">
+              Revenue growth under regulatory scrutiny — not in spite of it.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ==================== PROVEN RESULTS ==================== -->
+  <section class="py-20 px-6 lg:px-8 bg-gray-50">
+    <div class="max-w-6xl mx-auto">
+      <div class="text-center mb-14">
+        <p class="text-teal text-xs font-bold tracking-[0.15em] uppercase mb-3 reveal">Proven Results</p>
+        <h2 class="font-heading text-3xl sm:text-4xl font-bold reveal">Built on Evidence, Not Promises</h2>
+      </div>
+
+      <div class="grid grid-cols-2 lg:grid-cols-4 gap-6 mb-14 reveal">
+        <div class="bg-white border border-gray-200 rounded-2xl p-6 text-center hover:shadow-lg transition-shadow">
+          <div class="font-heading text-4xl font-extrabold text-teal mb-2">95%</div>
+          <div class="text-slate font-medium text-sm">Patient Retention</div>
+          <div class="text-warmgrey text-xs mt-1">vs 60–70% industry avg</div>
+        </div>
+        <div class="bg-white border border-gray-200 rounded-2xl p-6 text-center hover:shadow-lg transition-shadow">
+          <div class="font-heading text-4xl font-extrabold text-teal mb-2">10x</div>
+          <div class="text-slate font-medium text-sm">Clinician Capacity</div>
+          <div class="text-warmgrey text-xs mt-1">from 15–20 min to ~2 min</div>
+        </div>
+        <div class="bg-white border border-gray-200 rounded-2xl p-6 text-center hover:shadow-lg transition-shadow">
+          <div class="font-heading text-4xl font-extrabold text-teal mb-2">~2 min</div>
+          <div class="text-slate font-medium text-sm">Clinical Review</div>
+          <div class="text-warmgrey text-xs mt-1">structured clinical summary</div>
+        </div>
+        <div class="bg-white border border-gray-200 rounded-2xl p-6 text-center hover:shadow-lg transition-shadow">
+          <div class="font-heading text-4xl font-extrabold text-teal mb-2">100%</div>
+          <div class="text-slate font-medium text-sm">Audit-Ready</div>
+          <div class="text-warmgrey text-xs mt-1">from day one</div>
+        </div>
+      </div>
+
+      <!-- Partners -->
+      <div class="text-center reveal">
+        <p class="text-warmgrey text-sm font-medium mb-4 uppercase tracking-wider">Ecosystem Partners</p>
+        <div class="flex flex-wrap justify-center gap-4">
+          <span class="bg-white border border-gray-200 px-5 py-3 rounded-xl text-sm font-semibold text-navy">London Medical Laboratory (LML)</span>
+          <span class="bg-white border border-gray-200 px-5 py-3 rounded-xl text-sm font-semibold text-navy">Dr. Neesha Rebound Prevention</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ==================== CLIENT TESTIMONIAL ==================== -->
+  <section class="py-20 px-6 lg:px-8 bg-white">
+    <div class="max-w-4xl mx-auto">
+      <div class="text-center mb-10">
+        <p class="text-teal text-xs font-bold tracking-[0.15em] uppercase mb-3 reveal">Client Success</p>
+        <h2 class="font-heading text-3xl sm:text-4xl font-bold reveal">Trusted by Leading Clinics</h2>
+      </div>
+
+      <div class="reveal">
+        <div class="bg-gray-50 border border-gray-200 rounded-2xl p-10 md:p-12 relative">
+          <!-- Quote mark -->
+          <div class="absolute top-6 left-8 text-teal/15 text-8xl font-serif leading-none">"</div>
+
+          <div class="relative z-10">
+            <blockquote class="text-xl md:text-2xl text-navy font-medium leading-relaxed mb-8">
+              "ARIXA has completely transformed how we deliver our weight management services. The governance infrastructure means we can scale with absolute confidence — every patient journey is tracked, every clinical decision is evidenced, and we're always inspection-ready. It's given us the freedom to grow without ever compromising on safety."
+            </blockquote>
+
+            <div class="flex items-center gap-5">
+              <!-- Logo placeholder -->
+              <div class="w-16 h-16 rounded-xl bg-navy flex items-center justify-center flex-shrink-0">
+                <div class="text-center">
+                  <div class="text-teal-light text-[10px] font-bold tracking-wider leading-tight">HARLEY</div>
+                  <div class="text-white text-[8px] font-medium tracking-wide">WEIGHT LOSS</div>
+                  <div class="text-white text-[7px] tracking-wide">CLINIC</div>
+                </div>
+              </div>
+
+              <div>
+                <div class="font-heading font-bold text-navy text-lg">Warren Vaheeswaran</div>
+                <div class="text-warmgrey text-sm">CEO, Harley Weight Loss Clinic</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ==================== REGULATORY BOUNDARY ==================== -->
+  <section class="py-16 px-6 lg:px-8 bg-white">
+    <div class="max-w-4xl mx-auto reveal">
+      <h3 class="font-heading text-2xl font-bold mb-8 text-center">What ARIXA Is — and Isn't</h3>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="border-l-4 border-teal bg-gray-50 rounded-r-xl p-5">
+          <p class="text-navy font-semibold mb-2">Governance infrastructure and evidence generation</p>
+          <p class="text-warmgrey text-sm">We handle oversight, tracking, and documentation.</p>
+        </div>
+        <div class="border-l-4 border-teal bg-gray-50 rounded-r-xl p-5">
+          <p class="text-navy font-semibold mb-2">Professional judgement stays with practitioners</p>
+          <p class="text-warmgrey text-sm">Clinical decisions are always made by qualified professionals.</p>
+        </div>
+        <div class="border-l-4 border-teal bg-gray-50 rounded-r-xl p-5">
+          <p class="text-navy font-semibold mb-2">Statutory responsibility stays with you</p>
+          <p class="text-warmgrey text-sm">Regulatory accountability remains with the accountable officer.</p>
+        </div>
+      </div>
+
+      <div class="text-center mt-6">
+        <a href="#" class="text-teal font-semibold text-sm hover:underline">Read our full governance framework →</a>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ==================== LEADERSHIP TEAM ==================== -->
+  <section id="about" class="py-20 px-6 lg:px-8 bg-gray-50">
+    <div class="max-w-6xl mx-auto">
+      <div class="text-center mb-14">
+        <p class="text-teal text-xs font-bold tracking-[0.15em] uppercase mb-3 reveal">Our Team</p>
+        <h2 class="font-heading text-3xl sm:text-4xl font-bold reveal">Leadership</h2>
+        <p class="text-warmgrey text-lg mt-3 max-w-2xl mx-auto reveal">The team building the governance infrastructure for modern healthcare.</p>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 mb-20">
+        <!-- CEO -->
+        <div class="text-center reveal">
+          <div class="w-36 h-36 mx-auto rounded-2xl bg-navy/10 overflow-hidden mb-5 border-2 border-transparent hover:border-teal transition-colors">
+            <div class="w-full h-full flex items-center justify-center bg-gradient-to-br from-navy/5 to-teal/10">
+              <svg class="w-16 h-16 text-navy/20" fill="currentColor" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+            </div>
+          </div>
+          <h4 class="font-heading font-bold text-navy text-lg">Ari Sheraton</h4>
+          <p class="text-teal text-sm font-semibold mb-2">Chief Executive Officer</p>
+          <p class="text-warmgrey text-sm leading-relaxed">Founder and visionary behind ARIXA. Background in healthcare operations and digital transformation.</p>
+        </div>
+
+        <!-- CTO -->
+        <div class="text-center reveal reveal-delay-1">
+          <div class="w-36 h-36 mx-auto rounded-2xl bg-navy/10 overflow-hidden mb-5 border-2 border-transparent hover:border-teal transition-colors">
+            <div class="w-full h-full flex items-center justify-center bg-gradient-to-br from-navy/5 to-teal/10">
+              <svg class="w-16 h-16 text-navy/20" fill="currentColor" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+            </div>
+          </div>
+          <h4 class="font-heading font-bold text-navy text-lg">James Whitfield</h4>
+          <p class="text-teal text-sm font-semibold mb-2">Chief Technology Officer</p>
+          <p class="text-warmgrey text-sm leading-relaxed">Leads platform architecture and engineering. Specialist in scalable healthcare systems and data security.</p>
+        </div>
+
+        <!-- COO -->
+        <div class="text-center reveal reveal-delay-2">
+          <div class="w-36 h-36 mx-auto rounded-2xl bg-navy/10 overflow-hidden mb-5 border-2 border-transparent hover:border-teal transition-colors">
+            <div class="w-full h-full flex items-center justify-center bg-gradient-to-br from-navy/5 to-teal/10">
+              <svg class="w-16 h-16 text-navy/20" fill="currentColor" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+            </div>
+          </div>
+          <h4 class="font-heading font-bold text-navy text-lg">Sarah Mitchell</h4>
+          <p class="text-teal text-sm font-semibold mb-2">Chief Operating Officer</p>
+          <p class="text-warmgrey text-sm leading-relaxed">Drives operational excellence and client implementation. Former NHS digital programme lead.</p>
+        </div>
+
+        <!-- Head of Clinical -->
+        <div class="text-center reveal reveal-delay-3">
+          <div class="w-36 h-36 mx-auto rounded-2xl bg-navy/10 overflow-hidden mb-5 border-2 border-transparent hover:border-teal transition-colors">
+            <div class="w-full h-full flex items-center justify-center bg-gradient-to-br from-navy/5 to-teal/10">
+              <svg class="w-16 h-16 text-navy/20" fill="currentColor" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+            </div>
+          </div>
+          <h4 class="font-heading font-bold text-navy text-lg">Dr. Priya Kapoor</h4>
+          <p class="text-teal text-sm font-semibold mb-2">Head of Clinical Governance</p>
+          <p class="text-warmgrey text-sm leading-relaxed">Ensures clinical integrity across the platform. Practising pharmacist with 15 years in regulatory affairs.</p>
+        </div>
+      </div>
+
+      <!-- ADVISORS -->
+      <div class="text-center mb-12">
+        <p class="text-teal text-xs font-bold tracking-[0.15em] uppercase mb-3 reveal">Strategic Guidance</p>
+        <h2 class="font-heading text-3xl sm:text-4xl font-bold reveal">Advisors</h2>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 max-w-4xl mx-auto">
+        <!-- Advisor 1 -->
+        <div class="reveal">
+          <div class="bg-white border border-gray-200 rounded-2xl p-6 hover:shadow-lg hover:border-teal/30 transition-all">
+            <div class="flex items-center gap-4 mb-4">
+              <div class="w-14 h-14 rounded-xl bg-navy/10 flex items-center justify-center flex-shrink-0">
+                <svg class="w-7 h-7 text-navy/20" fill="currentColor" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+              </div>
+              <div>
+                <h4 class="font-heading font-bold text-navy">Prof. Richard Deane</h4>
+                <p class="text-teal text-xs font-semibold">Regulatory & Policy</p>
+              </div>
+            </div>
+            <p class="text-warmgrey text-sm leading-relaxed">Former Chief Pharmaceutical Officer. Expert in UK pharmacy regulation and GPhC policy frameworks.</p>
+          </div>
+        </div>
+
+        <!-- Advisor 2 -->
+        <div class="reveal reveal-delay-1">
+          <div class="bg-white border border-gray-200 rounded-2xl p-6 hover:shadow-lg hover:border-teal/30 transition-all">
+            <div class="flex items-center gap-4 mb-4">
+              <div class="w-14 h-14 rounded-xl bg-navy/10 flex items-center justify-center flex-shrink-0">
+                <svg class="w-7 h-7 text-navy/20" fill="currentColor" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+              </div>
+              <div>
+                <h4 class="font-heading font-bold text-navy">David Chen</h4>
+                <p class="text-teal text-xs font-semibold">Health-Tech & Scale</p>
+              </div>
+            </div>
+            <p class="text-warmgrey text-sm leading-relaxed">Serial health-tech entrepreneur. Led two successful SaaS exits in clinical operations. Advises on product-market fit and growth strategy.</p>
+          </div>
+        </div>
+
+        <!-- Advisor 3 -->
+        <div class="reveal reveal-delay-2">
+          <div class="bg-white border border-gray-200 rounded-2xl p-6 hover:shadow-lg hover:border-teal/30 transition-all">
+            <div class="flex items-center gap-4 mb-4">
+              <div class="w-14 h-14 rounded-xl bg-navy/10 flex items-center justify-center flex-shrink-0">
+                <svg class="w-7 h-7 text-navy/20" fill="currentColor" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+              </div>
+              <div>
+                <h4 class="font-heading font-bold text-navy">Dr. Elena Vasquez</h4>
+                <p class="text-teal text-xs font-semibold">Clinical & GLP-1</p>
+              </div>
+            </div>
+            <p class="text-warmgrey text-sm leading-relaxed">Leading obesity medicine specialist. Advisor on GLP-1 clinical protocols, NICE pathway adherence, and prescribing governance.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ==================== CTA BANNER ==================== -->
+  <section id="contact" class="gradient-navy py-20 px-6 lg:px-8 relative overflow-hidden">
+    <div class="absolute top-0 right-0 w-72 h-72 bg-teal/10 rounded-full blur-3xl"></div>
+    <div class="max-w-4xl mx-auto text-center relative z-10 reveal">
+      <h2 class="font-heading text-3xl sm:text-4xl font-bold text-white mb-4">Ready to Remove Governance as a Bottleneck?</h2>
+      <p class="text-gray-300 text-lg mb-8 max-w-2xl mx-auto">See how ARIXA can transform your clinical services operation. Start with a conversation.</p>
+
+      <div class="flex flex-col sm:flex-row gap-4 justify-center mb-6">
+        <a href="mailto:admin@arixahealth.com" class="inline-flex items-center justify-center px-7 py-3.5 bg-teal text-white font-semibold rounded-lg hover:bg-[#008B8E] transition-all hover:-translate-y-0.5">
+          Request a Demo
+        </a>
+        <a href="mailto:admin@arixahealth.com" class="inline-flex items-center justify-center px-7 py-3.5 border-2 border-white/30 text-white font-semibold rounded-lg hover:bg-white hover:text-navy transition-all">
+          Book an Operational Readiness Review
+        </a>
+      </div>
+
+      <p class="text-white/60 text-sm">From £499/month · No long-term contract required</p>
+    </div>
+  </section>
+
+
+  <!-- ==================== FOOTER ==================== -->
+  <footer class="bg-navy pt-16 pb-8 px-6 lg:px-8">
+    <div class="max-w-6xl mx-auto">
+      <div class="grid grid-cols-2 md:grid-cols-5 gap-8 mb-12">
+        <!-- Logo col -->
+        <div class="col-span-2 md:col-span-1">
+          <div class="flex items-center gap-2 mb-4">
+            <span class="inline-block w-3 h-3 bg-teal rounded-sm"></span>
+            <span class="font-heading font-extrabold text-lg text-white">ARIXA</span>
+            <span class="text-warmgrey text-xs font-semibold tracking-[0.15em]">HEALTH</span>
+          </div>
+          <p class="text-white/50 text-sm leading-relaxed">Governance infrastructure for modern healthcare.</p>
+        </div>
+
+        <div>
+          <h4 class="text-teal-light text-xs font-bold tracking-widest uppercase mb-4">Platform</h4>
+          <a href="#" class="block text-white/60 text-sm mb-2.5 hover:text-teal transition-colors">Control Readiness</a>
+          <a href="#" class="block text-white/60 text-sm mb-2.5 hover:text-teal transition-colors">Operational Oversight</a>
+          <a href="#" class="block text-white/60 text-sm mb-2.5 hover:text-teal transition-colors">Evidence & Traceability</a>
+        </div>
+
+        <div>
+          <h4 class="text-teal-light text-xs font-bold tracking-widest uppercase mb-4">Solutions</h4>
+          <a href="#" class="block text-white/60 text-sm mb-2.5 hover:text-teal transition-colors">Pharmacy Operations</a>
+          <a href="#" class="block text-white/60 text-sm mb-2.5 hover:text-teal transition-colors">GLP-1 Prescribing</a>
+          <a href="#" class="block text-white/60 text-sm mb-2.5 hover:text-teal transition-colors">Scaling Services</a>
+        </div>
+
+        <div>
+          <h4 class="text-teal-light text-xs font-bold tracking-widest uppercase mb-4">Company</h4>
+          <a href="#" class="block text-white/60 text-sm mb-2.5 hover:text-teal transition-colors">About</a>
+          <a href="#" class="block text-white/60 text-sm mb-2.5 hover:text-teal transition-colors">Governance</a>
+          <a href="#" class="block text-white/60 text-sm mb-2.5 hover:text-teal transition-colors">Security</a>
+          <a href="#" class="block text-white/60 text-sm mb-2.5 hover:text-teal transition-colors">Resources</a>
+        </div>
+
+        <div>
+          <h4 class="text-teal-light text-xs font-bold tracking-widest uppercase mb-4">Contact</h4>
+          <a href="mailto:admin@arixahealth.com" class="block text-white/60 text-sm mb-2.5 hover:text-teal transition-colors">admin@arixahealth.com</a>
+          <p class="text-white/40 text-sm mt-3">ARIXA Health Ltd<br>London, UK</p>
+        </div>
+      </div>
+
+      <div class="border-t border-white/10 pt-8 flex flex-col sm:flex-row justify-between items-center gap-4">
+        <p class="text-white/40 text-sm">© 2026 ARIXA Health Ltd. All rights reserved.</p>
+        <div class="flex gap-6">
+          <a href="#" class="text-white/40 text-sm hover:text-white/70 transition-colors">Privacy Policy</a>
+          <a href="#" class="text-white/40 text-sm hover:text-white/70 transition-colors">Terms of Service</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+
+  <!-- ==================== SCRIPTS ==================== -->
+  <script>
+    // Hamburger
+    document.getElementById('hamburger').addEventListener('click', function() {
+      const menu = document.getElementById('mobileMenu');
+      menu.classList.toggle('hidden');
+      const spans = this.querySelectorAll('span');
+      if (!menu.classList.contains('hidden')) {
+        spans[0].style.transform = 'rotate(45deg) translate(4px, 4px)';
+        spans[1].style.opacity = '0';
+        spans[2].style.transform = 'rotate(-45deg) translate(4px, -4px)';
+      } else {
+        spans[0].style.transform = ''; spans[1].style.opacity = ''; spans[2].style.transform = '';
+      }
+    });
+
+    // Explainer tabs
+    document.querySelectorAll('.explainer-tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        document.querySelectorAll('.explainer-tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.explainer-panel').forEach(p => p.classList.remove('active'));
+        tab.classList.add('active');
+        document.getElementById(tab.dataset.panel).classList.add('active');
+      });
+    });
+
+    // Scroll reveal
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) { entry.target.classList.add('visible'); }
+      });
+    }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+
+    document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+    // Navbar shadow on scroll
+    window.addEventListener('scroll', () => {
+      document.getElementById('navbar').classList.toggle('shadow-md', window.scrollY > 10);
+    });
+
+    // Smooth scroll
+    document.querySelectorAll('a[href^="#"]').forEach(a => {
+      a.addEventListener('click', e => {
+        const target = document.querySelector(a.getAttribute('href'));
+        if (target) { e.preventDefault(); target.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+        // Close mobile menu
+        document.getElementById('mobileMenu').classList.add('hidden');
+      });
+    });
+  </script>
+</body>
+</html>
